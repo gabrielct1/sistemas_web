@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Timer</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2275%22>🍅</text></svg>"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="navbar">
+      <button
+        class="icon-btn"
+        aria-label="Configurações"
+        title="Configurações"
+        onclick="openConfigModal()"
+      >
+        <img
+          src="{{ url_for('static', filename='icons/setting.png') }}"
+          alt="Configurações"
+          style="width: 22px; height: 22px; object-fit: contain"
+        />
+      </button>
+      <button
+        class="icon-btn"
+        aria-label="Relatórios"
+        title="Relatórios"
+        onclick="openReportModal()"
+      >
+        <img
+          src="{{ url_for('static', filename='icons/document.png') }}"
+          alt="Relatórios"
+          style="width: 26px; height: 26px; object-fit: contain"
+        />
+      </button>
+      <a class="icon-btn" href="/logout" aria-label="Sair" title="Sair">
+        <img
+          src="{{ url_for('static', filename='icons/exit.png') }}"
+          alt="Sair"
+          style="width: 20px; height: 20px; object-fit: contain"
+        />
+      </a>
+    </div>
+
+    <div class="timer-container">
+      <h1>🍅 Timer</h1>
+      <div class="session-type" id="sessionType">Estudos</div>
+      <div class="timer-box">
+        <div class="timer" id="timer">25:00</div>
+      </div>
+      <div class="controls">
+        <button class="btn-start" id="startBtn" onclick="toggleTimer()">
+          Iniciar
+        </button>
+        <button class="btn-skip" id="skipBtn" onclick="skipToNext()">
+          <img
+            src="{{ url_for('static', filename='icons/next-button.png') }}"
+            alt=">>"
+            style="width: 18px; height: 18px; object-fit: contain"
+          />
+        </button>
+        <button class="btn-reset icon-btn" onclick="resetTimer()">
+          <img
+            src="{{ url_for('static', filename='icons/restart.png') }}"
+            alt="Reiniciar"
+            style="width: 18px; height: 18px; object-fit: contain"
+          />
+        </button>
+      </div>
+      <div class="pomodoro-count" id="pomodoroCount">
+        Pomodoros completados: 0
+      </div>
+      <div
+        id="inlineReport"
+        style="
+          margin-top: 18px;
+          max-width: 560px;
+          margin-left: auto;
+          margin-right: auto;
+          text-align: center;
+        "
+      >
+        <div id="inlineReportTotal" style="font-weight: 600; opacity: 0.95">
+          Total focado: 0 min
+        </div>
+        <!-- recent session element removed intentionally -->
+      </div>
+    </div>
+
+    <div id="musicPlayer" class="hidden"></div>
+
+    <div id="configModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <h2>Configurações</h2>
+          <button
+            class="modal-close"
+            type="button"
+            onclick="closeConfigModal()"
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+        </div>
+        <form
+          id="configForm"
+          onsubmit="
+            event.preventDefault();
+            saveConfigModal();
+          "
+        >
+          <div class="modal-content">
+            <div class="row">
+              <label>Tempo de Foco (min)</label>
+              <input type="number" id="cfg_work_time" min="1" max="60" />
+            </div>
+            <div class="row">
+              <label>Pausa Curta (min)</label>
+              <input type="number" id="cfg_short_break" min="1" max="30" />
+            </div>
+            <div class="row">
+              <label>Pausa Longa (min)</label>
+              <input type="number" id="cfg_long_break" min="1" max="60" />
+            </div>
+            <div class="row">
+              <label>Pomodoros até pausa longa</label>
+              <input
+                type="number"
+                id="cfg_pomodoros_until_long_break"
+                min="2"
+                max="10"
+              />
+            </div>
+            <div class="row" style="align-items: center">
+              <label>Ativar música de fundo</label>
+              <input type="checkbox" id="cfg_music_enabled" />
+            </div>
+            <div class="btn-row">
+              <button type="submit" class="btn-start">Salvar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="reportModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <h2>Relatórios Diários</h2>
+          <button
+            class="modal-close"
+            type="button"
+            onclick="closeReportModal()"
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+        </div>
+        <div class="modal-content" style="max-height: 60vh; overflow: auto">
+          <div id="reportContent" style="padding: 6px">
+            <canvas
+              id="reportCanvas"
+              class="report-canvas"
+              aria-label="Gráfico de relatório"
+            ></canvas>
+            <div id="reportTableContainer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Pomodoro Timer</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2275%22>🍅</text></svg>"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="auth-h1">🍅 Pomodoro Timer</h1>
+      {% if error %}
+      <div
+        class="error"
+        style="color: #f55; margin-bottom: 12px; font-weight: 700"
+      >
+        {{ error }}
+      </div>
+      {% endif %}
+      <form method="POST">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            value="{{ email|default('') }}"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit" class="primary">Entrar</button>
+      </form>
+      <div class="link">Não tem conta? <a href="/register">Cadastre-se</a></div>
+    </div>
+  </body>
+</html>
