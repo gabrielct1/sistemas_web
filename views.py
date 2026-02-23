@@ -20,7 +20,6 @@ def login():
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
             return redirect(url_for('index'))
-        # Renderizar a mesma página com a mensagem de erro (não redirecionar)
         return render_template('login.html', error='Email ou senha incorretos', email=email)
     
     return render_template('login.html')
@@ -62,7 +61,6 @@ def logout():
 def config():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    # Mantemos suporte a POST; interface usa modal na página principal.
     if request.method == 'POST':
         user_config = PomodoroConfig.query.filter_by(user_id=session['user_id']).first()
         user_config.work_time = int(request.form.get('work_time', user_config.work_time))
@@ -95,7 +93,6 @@ def start_session():
         return jsonify({'error': 'Não autenticado'}), 401
     
     data = request.json or {}
-    # Não gravar a duração na criação — será definida ao finalizar (completa ou parcial)
     session_obj = PomodoroSession(
         user_id=session['user_id'],
         session_type=data.get('session_type'),
@@ -136,7 +133,6 @@ def complete_session(session_id):
                     session_obj.duration = int(delta.total_seconds() // 60)
                 session_obj.completed = True
         except Exception:
-            # Registrar exceção para facilitar depuração
             try:
                 current_app.logger.exception("Erro ao processar finalização de sessão %s", session_id)
             except Exception:
@@ -150,7 +146,6 @@ def complete_session(session_id):
 def relatorio():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    # Relatório agora é exibido inline na página principal; redirecionar.
     return redirect(url_for('index'))
 
 
@@ -177,14 +172,12 @@ def save_config_api():
 def api_report():
     if 'user_id' not in session:
         return jsonify({'error': 'Não autenticado'}), 401
-    # Incluir sessões de trabalho que tenham `duration` preenchido (completas ou parciais)
     sessions = PomodoroSession.query.filter(
         PomodoroSession.user_id == session['user_id'],
         PomodoroSession.session_type == 'work',
         PomodoroSession.duration != None
     ).order_by(PomodoroSession.start_time.desc()).all()
 
-    # Lista plana de sessões (compatibilidade)
     sessions_data = [
         {
             'id': s.id,
